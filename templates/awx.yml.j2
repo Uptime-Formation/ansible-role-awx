@@ -1,0 +1,9 @@
+apiVersion: awx.ansible.com/v1beta1
+kind: AWX
+metadata:
+  name: awx-coopaname
+spec:
+  ingress_type: ingress
+  hostname: {{ awx_hostname }}
+  # service_type: LoadBalancer
+  service_type: nodeport

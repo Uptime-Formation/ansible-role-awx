@@ -1,0 +1,68 @@
+- name: install apt dependencies
+  apt:
+    name:
+      - python3-pip
+      - git
+      - gcc
+    state: present
+
+- name: Clone AWX operator
+  git:
+    repo: "{{ awx_operator_repo }}"
+    dest: "{{ awx_operator_repo_dir }}"
+    version: "{{ awx_operator_version }}"
+    force: yes
+    update: yes
+  # ignore_errors: true
+
+# - name: Build, push AWX operator
+#   shell:
+#     cmd: "IMAGE_TAG_BASE=localhost:{{ k3s_registry_port }}/awx-operator make docker-build docker-push"
+#     chdir: "{{awx_operator_repo_dir}}"
+
+- name: Deploy AWX operator
+  shell:
+    cmd: "make deploy"
+    # cmd: "IMAGE_TAG_BASE=localhost:{{ k3s_registry_port }}/awx-operator make deploy"
+    chdir: "{{awx_operator_repo_dir}}"
+
+- name: Setup awx instance
+  template:
+    src: awx.yml.j2
+    dest: "{{ awx_repo_dir }}/awx.yml"
+
+- name: Deploy AWX
+  shell:
+    cmd: "kubectl apply -f awx.yml -n awx"
+    chdir: "{{awx_repo_dir}}"
+  register: awx_deploy
+  changed_when: "'unchanged' not in awx_deploy.stdout"
+
+# - name: Clone AWX
+#   git:
+#     repo: "{{ awx_repo }}"
+#     dest: "{{ awx_repo_dir }}"
+#     version: "{{ awx_version }}"
+#     accept_hostkey: yes
+#     update: yes
+#   ignore_errors: true
+
+- name: Ensure AWX cli installed
+  pip:
+    name: awxkit
+    executable: pip3
+  become: yes
+
+# - name: Export all tower assets
+#   awx.awx.tower_export:
+#     tower_host: "{{ awx_cli_host }}"
+#     tower_username: "{{ awx_cli_username }}"
+#     tower_password: "{{ awx_cli_password }}"
+#     all: True
+#   register: awx_export_output
+
+# - name: Write tower assets exports in a file
+#   copy:
+#     dest: "{{ awx_repo_dir }}/awx-export-{{ ansible_date_time.iso8601_basic_short }}"
+#     content: "{{ awx_export_output }}"
+#     # content: "{{ awx_export_output.assets }}"

@@ -1,0 +1,23 @@
+awx_repo: https://github.com/ansible/awx.git
+# awx_repo: https://github.com/Uptime-Formation/awx.git
+
+awx_hostname: awx.local
+
+awx_repo_dir: "/opt/awx"
+awx_operator_repo: https://github.com/ansible/awx-operator.git
+awx_operator_repo_dir: "/opt/awx-operator"
+awx_operator_version: 0.14.0
+
+awx_ansiblemaster_privkey_path: ~
+k3s_registry_port: 32500
+awx_project_branch: master
+awx_version: 19.3.0
+
+awx_external_postgres: no
+awx_pg_hostname: ~
+awx_pg_database: ~
+awx_pg_username: ~
+awx_pg_password: ~
+awx_pg_admin_password: ~
+
+awx_secret_key: ~
